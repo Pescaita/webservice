@@ -39,6 +39,14 @@ async def main(request):
     # return a "Success"
     return web.Response(status=200)
 
+@router.register("pull_request", action="closed")
+async def pull_request_closed_event(event, gh, *args, **kwargs):
+    """ Whenever a pull request is closed, say thanks."""
+    url = event.data["pull_request"]["issue_url"]
+    author = event.data["pull_request"]["user"]["login"]
+
+    message = f"Thanks for the merge @{author}!"
+    await gh.post(url, data={"body": message})
 
 if __name__ == "__main__":
     app = web.Application()
